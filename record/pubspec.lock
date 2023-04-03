@@ -83,6 +83,20 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  record_android:
+    dependency: "direct overridden"
+    description:
+      path: "../record_android"
+      relative: true
+    source: path
+    version: "1.0.0"
+  record_ios:
+    dependency: "direct overridden"
+    description:
+      path: "../record_ios"
+      relative: true
+    source: path
+    version: "1.0.0"
   record_linux:
     dependency: "direct main"
     description:
