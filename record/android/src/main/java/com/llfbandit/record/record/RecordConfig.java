@@ -1,18 +1,22 @@
 package com.llfbandit.record.record;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Map;
 
 public class RecordConfig {
-  final String path;
-  final String encoder;
-  final int bitRate;
-  final int samplingRate;
-  final int numChannels;
-  final Map<String, Object> device;
-  final boolean noiseCancel;
-  final boolean autoGain;
+  @Nullable
+  public final String path;
+  @NonNull
+  public final String encoder;
+  public final int bitRate;
+  public final int samplingRate;
+  public final int numChannels;
+  @Nullable
+  public final Map<String, Object> device;
+  public final boolean noiseCancel;
+  public final boolean autoGain;
 
   /**
    * @param path         The output path to write the file.
@@ -25,12 +29,12 @@ public class RecordConfig {
    * @param autoGain     Enables automatic gain control if available.
    */
   public RecordConfig(
-      String path,
+      @Nullable String path,
       @NonNull String encoder,
       int bitRate,
       int samplingRate,
       int numChannels,
-      Map<String, Object> device,
+      @Nullable Map<String, Object> device,
       boolean noiseCancel,
       boolean autoGain
   ) {

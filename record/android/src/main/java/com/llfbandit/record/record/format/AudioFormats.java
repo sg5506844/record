@@ -3,81 +3,61 @@ package com.llfbandit.record.record.format;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Build;
+import android.util.Log;
 
 public class AudioFormats {
   private AudioFormats() {
   }
 
-  static List<String> getEncoderNamesForType(String mime) {
-    List<String> names = new ArrayList<>();
+//  https://github.com/dburckh/EncodeRawAudio/blob/develop/app/src/main/java/com/homesoft/encoderawaudio/EncodeViewModel.kt
+//  https://android.googlesource.com/platform/frameworks/base/+/master/packages/SystemUI/src/com/android/systemui/screenrecord/ScreenInternalAudioRecorder.java
+//  https://github.com/jeryz/AudioRecorder/tree/master/lib_recorder/src/main/java/com/zjr/recorder/processor
+//  Samples / amplitude
+  // https://www.programcreek.com/java-api-examples/?code=NandagopalR%2FAndroid-Audio-Recorder%2FAndroid-Audio-Recorder-master%2Fapp%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgithub%2Faxet%2Faudiorecorder%2Fencoders%2FFormat3GP.java#
+  // https://github.com/HelloHuDi/AudioCapture/blob/master/audiocapture/src/main/java/com/hd/audiocapture/capture/AudioRecordCapture.java
 
-    int n = MediaCodecList.getCodecCount();
+  public static boolean isEncoderSupported(String mimeType) {
+    MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
 
-    for (int i = 0; i < n; ++i) {
-      MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
-      if (!info.isEncoder()) {
-        continue;
-      }
-
-      if (!info.getName().startsWith("OMX.")) {
-        // Unfortunately for legacy reasons, "AACEncoder", a
-        // non OMX component had to be in this list for the video
-        // editor code to work... but it cannot actually be instantiated
-        // using MediaCodec.
-        continue;
-      }
-
-      String[] supportedTypes = info.getSupportedTypes();
-      for (String supportedType : supportedTypes) {
-        if (supportedType.equalsIgnoreCase(mime)) {
-          names.add(info.getName());
-          break;
+    for (MediaCodecInfo info : mcl.getCodecInfos()) {
+      if (info.isEncoder()) {
+        for (String supportedType : info.getSupportedTypes()) {
+          if (supportedType.equalsIgnoreCase(mimeType)) {
+            return true;
+          }
         }
       }
     }
-    return names;
+
+    return false;
   }
 
-  static MediaFormat getAmrNbFormat(int channels, int bitRate) {
-//    final int bitRates[] = { 4750, 5150, 5900, 6700, 7400, 7950, 10200, 12200 };
+  public static String getMimeType(String encoder) {
+    switch (encoder) {
+      case "aacLc":
+      case "aacEld":
+      case "aacHe":
+        return MediaFormat.MIMETYPE_AUDIO_AAC;
+      case "amrNb":
+        return MediaFormat.MIMETYPE_AUDIO_AMR_NB;
+      case "amrWb":
+        return MediaFormat.MIMETYPE_AUDIO_AMR_WB;
+      case "wav":
+      case "pcm16bit":
+      case "pcm8bit":
+        return MediaFormat.MIMETYPE_AUDIO_RAW;
+      case "opus":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          return MediaFormat.MIMETYPE_AUDIO_OPUS;
+        }
 
-    MediaFormat format = new MediaFormat();
-
-    format.setString(MediaFormat.KEY_MIME, "audio/3gpp");
-    format.setInteger(MediaFormat.KEY_SAMPLE_RATE, 8000); // required by SDK
-    format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, channels);
-    format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-
-    return format;
-  }
-
-  static MediaFormat getAmrWbFormat(int channels, int bitRate) {
-//    final int bitRates[] = { 6600, 8850, 12650, 14250, 15850, 18250, 19850, 23050, 23850 };
-
-    MediaFormat format = new MediaFormat();
-
-    format.setString(MediaFormat.KEY_MIME, "audio/amr-wb");
-    format.setInteger(MediaFormat.KEY_SAMPLE_RATE, 16000); // required by SDK
-    format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, channels);
-    format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-
-    return format;
-  }
-
-  static MediaFormat getAacFormat(int channels, int bitRate, int sampleRate, AacProfile profile) {
-//    final int sampleRates[] = { 8000, 11025, 22050, 44100, 48000 };
-
-    MediaFormat format = new MediaFormat();
-
-    format.setString(MediaFormat.KEY_MIME, "audio/mp4a-latm");
-    format.setInteger(MediaFormat.KEY_AAC_PROFILE, profile.id);
-    format.setInteger(MediaFormat.KEY_SAMPLE_RATE, sampleRate);
-    format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, channels);
-    format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-
-    return format;
+        Log.d("Record", "Api < 29: Opus is not supported. Reverting to default AAC media format.");
+        return MediaFormat.MIMETYPE_AUDIO_AAC;
+      case "vorbisOgg":
+        return MediaFormat.MIMETYPE_AUDIO_VORBIS;
+      default:
+        return null;
+    }
   }
 }

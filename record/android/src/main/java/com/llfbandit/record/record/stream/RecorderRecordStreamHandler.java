@@ -1,10 +1,17 @@
-package com.llfbandit.record.stream;
+package com.llfbandit.record.record.stream;
+
+import android.app.Activity;
+
+import androidx.annotation.Nullable;
 
 import io.flutter.plugin.common.EventChannel;
 
 public class RecorderRecordStreamHandler implements EventChannel.StreamHandler {
   // Event producer
   private EventChannel.EventSink eventSink;
+
+  @Nullable
+  private Activity activity;
 
   @Override
   public void onListen(Object o, EventChannel.EventSink eventSink) {
@@ -17,14 +24,12 @@ public class RecorderRecordStreamHandler implements EventChannel.StreamHandler {
   }
 
   public void sendRecordChunkEvent(byte[] buffer) {
-    if (eventSink != null) {
-      eventSink.success(buffer);
+    if (eventSink != null && activity != null) {
+      activity.runOnUiThread((Runnable) () -> eventSink.success(buffer));
     }
   }
 
-  public void closeRecordChunkStream() {
-    if (eventSink != null) {
-      eventSink.endOfStream();
-    }
+  public void setActivity(@Nullable Activity activity) {
+    this.activity = activity;
   }
 }

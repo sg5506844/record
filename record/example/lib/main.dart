@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 import 'package:record_example/audio_player.dart';
@@ -30,6 +32,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
   void initState() {
     _recordSub = _audioRecorder.onStateChanged().listen((recordState) {
       setState(() => _recordState = recordState);
+    }, onError: (error) {
+      debugPrint(error);
     });
 
     _amplitudeSub = _audioRecorder
@@ -50,15 +54,17 @@ class _AudioRecorderState extends State<AudioRecorder> {
           print('${AudioEncoder.aacLc.name} supported: $isSupported');
         }
 
+        final dir = await getApplicationDocumentsDirectory();
+
         // final devs = await _audioRecorder.listInputDevices();
         // final isRecording = await _audioRecorder.isRecording();
 
-        // await _audioRecorder.start();
-        final stream = await _audioRecorder.startStream();
-        stream.listen(
-          (event) => print(event),
-          onDone: () => print('onDone'),
-        );
+        await _audioRecorder.start(path: p.join(dir.path, 'test.m4a'));
+        // final stream = await _audioRecorder.startStream();
+        // stream.listen(
+        //   (event) => print(event),
+        //   onDone: () => print('onDone'),
+        // );
 
         _recordDuration = 0;
 

@@ -1,31 +1,45 @@
-package com.llfbandit.record.record.header;
+package com.llfbandit.record.record.processor;
 
-import java.io.DataOutput;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.llfbandit.record.record.PCMReader;
+import com.llfbandit.record.record.RecordConfig;
+
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
-public class WavHeader implements HeaderWriter {
-  final int samplingRate;
-  final int bufferSize;
-  final short channels;
-  final short bitsPerSample;
+public class WavProcessor extends PcmProcessor {
   private int audioDataLength = 0;
 
-  public WavHeader(int samplingRate,
-                   int bufferSize,
-                   short channels,
-                   short bitsPerSample
-  ) {
-    this.samplingRate = samplingRate;
-    this.bufferSize = bufferSize;
-    this.channels = channels;
-    this.bitsPerSample = bitsPerSample;
+  public WavProcessor(@NonNull OnAudioProcessorListener listener) {
+    super(listener);
   }
 
-  public void setAudioDataLength(int audioLength) {
-    audioDataLength = audioLength;
+  @Override
+  public void onBegin(RecordConfig config) throws Exception {
+    if (config.path == null) {
+      throw new Exception("Wav must be recorded into file. Given path is null.");
+    }
+
+    // Prepares WAV header & avoids data overwrites.
+    writeHeader();
   }
 
-  public void write(DataOutput out) throws IOException {
+  @Override
+  public void onEnd() throws Exception {
+    writeHeader();
+  }
+
+  @Override
+  protected void onAudioChunk(byte[] chunk, int length) throws Exception {
+    audioDataLength += length;
+    // Write to file
+    assert out != null;
+    out.write(chunk, 0, length);
+  }
+
+  private void writeHeader() throws IOException {
 // Offset  Size  Name             Description
 
 // The canonical WAVE format starts with the RIFF header:
@@ -74,16 +88,19 @@ public class WavHeader implements HeaderWriter {
 //                                number.
 // 44        *   Data             The actual sound data.
 
+    short bitsPerSample = config.encoder.equals("pcm16bit") ? (short) 16 : (short) 8;
+
+    out.seek(0);
     out.writeBytes("RIFF"); // ChunkID
     out.writeInt(Integer.reverseBytes(36 + audioDataLength)); // ChunkSize
     out.writeBytes("WAVE"); // Format
     out.writeBytes("fmt "); // Subchunk1ID
     out.writeInt(Integer.reverseBytes(16)); // Subchunk1Size
     out.writeShort(Short.reverseBytes((short) 1)); // AudioFormat, 1 for PCM
-    out.writeShort(Short.reverseBytes(channels)); // NumChannels
-    out.writeInt(Integer.reverseBytes(samplingRate)); // SampleRate
-    out.writeInt(Integer.reverseBytes(samplingRate * channels * bitsPerSample / 8)); // ByteRate
-    out.writeShort(Short.reverseBytes((short) (channels * bitsPerSample / 8))); // BlockAlign
+    out.writeShort(Short.reverseBytes((short) config.numChannels)); // NumChannels
+    out.writeInt(Integer.reverseBytes(config.samplingRate)); // SampleRate
+    out.writeInt(Integer.reverseBytes(config.samplingRate * config.numChannels * bitsPerSample / 8)); // ByteRate
+    out.writeShort(Short.reverseBytes((short) (config.numChannels * bitsPerSample / 8))); // BlockAlign
     out.writeShort(Short.reverseBytes(bitsPerSample)); // BitsPerSample
     out.writeBytes("data"); // Subchunk2ID
     out.writeInt(Integer.reverseBytes(audioDataLength)); // Subchunk2Size

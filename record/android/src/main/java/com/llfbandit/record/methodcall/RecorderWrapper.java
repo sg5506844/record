@@ -1,30 +1,49 @@
 package com.llfbandit.record.methodcall;
 
+import android.app.Activity;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.llfbandit.record.record.AudioRecorder;
 import com.llfbandit.record.record.RecordConfig;
-import com.llfbandit.record.record.RecorderBase;
-import com.llfbandit.record.stream.RecorderRecordStreamHandler;
-import com.llfbandit.record.stream.RecorderStateStreamHandler;
+import com.llfbandit.record.record.stream.RecorderRecordStreamHandler;
+import com.llfbandit.record.record.stream.RecorderStateStreamHandler;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 
 class RecorderWrapper {
+  static final String EVENTS_STATE_CHANNEL = "com.llfbandit.record/events";
+  static final String EVENTS_RECORD_CHANNEL = "com.llfbandit.record/eventsRecord";
+
+  private EventChannel eventChannel;
+  private RecorderStateStreamHandler recorderStateStreamHandler = new RecorderStateStreamHandler();
+  private EventChannel eventRecordChannel;
+  private RecorderRecordStreamHandler recorderRecordStreamHandler = new RecorderRecordStreamHandler();
+
   @Nullable
-  private RecorderBase recorder;
+  private AudioRecorder recorder;
 
-  // Event producer
-  private final RecorderStateStreamHandler recorderStateStreamHandler;
-  private final RecorderRecordStreamHandler recorderRecordStreamHandler;
+  @Nullable
+  private RecordConfig config;
 
-  RecorderWrapper(
-      @NonNull RecorderStateStreamHandler recorderStateStreamHandler,
-      @NonNull RecorderRecordStreamHandler recorderRecordStreamHandler
-  ) {
-    this.recorderStateStreamHandler = recorderStateStreamHandler;
-    this.recorderRecordStreamHandler = recorderRecordStreamHandler;
+  RecorderWrapper(@NonNull BinaryMessenger messenger) {
+    eventChannel = new EventChannel(messenger, EVENTS_STATE_CHANNEL);
+    eventChannel.setStreamHandler(recorderStateStreamHandler);
+
+    eventRecordChannel = new EventChannel(messenger, EVENTS_RECORD_CHANNEL);
+    eventRecordChannel.setStreamHandler(recorderRecordStreamHandler);
+  }
+
+  public void setActivity(@Nullable Activity activity) {
+    recorderStateStreamHandler.setActivity(activity);
+    recorderRecordStreamHandler.setActivity(activity);
   }
 
   void startRecordingToFile(RecordConfig config, @NonNull MethodChannel.Result result) {
@@ -35,9 +54,24 @@ class RecorderWrapper {
     startRecording(config, result);
   }
 
-  void close() {
+  void dispose() {
     if (recorder != null) {
-      recorder.close();
+      try {
+        recorder.dispose();
+      } catch (Exception ignored) {
+      } finally {
+        recorder = null;
+      }
+    }
+
+    if (eventChannel != null) {
+      eventChannel.setStreamHandler(null);
+      eventChannel = null;
+    }
+
+    if (eventRecordChannel != null) {
+      eventRecordChannel.setStreamHandler(null);
+      eventRecordChannel = null;
     }
   }
 
@@ -72,7 +106,13 @@ class RecorderWrapper {
 
   void getAmplitude(@NonNull MethodChannel.Result result) {
     if (recorder != null) {
-      result.success(recorder.getAmplitude());
+      List<Double> amps = recorder.getAmplitude();
+
+      Map<String, Object> amp = new HashMap<>();
+      amp.put("current", amps.get(0));
+      amp.put("max", amps.get(1));
+
+      result.success(amp);
     } else {
       result.success(null);
     }
@@ -94,7 +134,8 @@ class RecorderWrapper {
   void stop(@NonNull MethodChannel.Result result) {
     if (recorder != null) {
       try {
-        result.success(recorder.stop());
+        recorder.stop();
+        result.success(config != null ? config.path : null);
       } catch (Exception e) {
         result.error("-2", e.getMessage(), e.getCause());
       }
@@ -105,8 +146,9 @@ class RecorderWrapper {
 
   private void startRecording(@NonNull RecordConfig config, @NonNull MethodChannel.Result result) {
     try {
-      close();
-      recorder = null;
+      dispose();
+
+      this.config = config;
 
       recorder = createRecorder(config);
 
@@ -117,7 +159,7 @@ class RecorderWrapper {
     }
   }
 
-  private RecorderBase createRecorder(@NonNull RecordConfig config) throws Exception {
+  private AudioRecorder createRecorder(@NonNull RecordConfig config) {
     return new AudioRecorder(
         config,
         recorderStateStreamHandler,

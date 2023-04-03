@@ -18,7 +18,6 @@ class Record implements RecordPlatform {
     int numChannels = 2,
     InputDevice? device,
   }) {
-    _log('Start recording');
     return RecordPlatform.instance.start(
       path: path,
       encoder: encoder,
@@ -37,8 +36,6 @@ class Record implements RecordPlatform {
     int numChannels = 2,
     InputDevice? device,
   }) {
-    _log('Start recording stream');
-
     return RecordPlatform.instance.startStream(
       encoder: encoder,
       bitRate: bitRate,
@@ -50,20 +47,16 @@ class Record implements RecordPlatform {
 
   @override
   Future<String?> stop() {
-    _log('Stop recording');
-
     return RecordPlatform.instance.stop();
   }
 
   @override
   Future<void> pause() {
-    _log('Pause recording');
     return RecordPlatform.instance.pause();
   }
 
   @override
   Future<void> resume() {
-    _log('Resume recording');
     return RecordPlatform.instance.resume();
   }
 
@@ -144,9 +137,5 @@ class Record implements RecordPlatform {
     if (await shouldUpdate()) {
       _amplitudeStreamCtrl?.add(await getAmplitude());
     }
-  }
-
-  void _log(String msg) {
-    if (kDebugMode) print(msg);
   }
 }
