@@ -9,8 +9,6 @@ import androidx.annotation.NonNull;
 import com.llfbandit.record.record.RecordConfig;
 import com.llfbandit.record.record.format.AudioCodecs;
 
-import java.nio.ByteBuffer;
-
 public class OggProcessor extends CodecProcessor {
   public OggProcessor(@NonNull OnAudioProcessorListener listener) {
     super(listener);

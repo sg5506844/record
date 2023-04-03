@@ -25,13 +25,13 @@ public class RecorderStateStreamHandler implements EventChannel.StreamHandler {
 
   public void sendStateEvent(int state) {
     if (eventSink != null && activity != null) {
-      activity.runOnUiThread((Runnable) () -> eventSink.success(state));
+      activity.runOnUiThread(() -> eventSink.success(state));
     }
   }
 
   public void sendStateErrorEvent(Exception ex) {
     if (eventSink != null && activity != null) {
-      activity.runOnUiThread((Runnable) () -> eventSink.error("-1", ex.getMessage(), ex));
+      activity.runOnUiThread(() -> eventSink.error("-1", ex.getMessage(), ex));
     }
   }
 

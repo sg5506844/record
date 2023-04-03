@@ -8,8 +8,6 @@ import androidx.annotation.NonNull;
 import com.llfbandit.record.record.RecordConfig;
 import com.llfbandit.record.record.format.AudioCodecs;
 
-import java.nio.ByteBuffer;
-
 public class FlacProcessor extends CodecProcessor {
   public FlacProcessor(@NonNull OnAudioProcessorListener listener) {
     super(listener);

@@ -23,9 +23,9 @@ class RecorderWrapper {
   static final String EVENTS_RECORD_CHANNEL = "com.llfbandit.record/eventsRecord";
 
   private EventChannel eventChannel;
-  private RecorderStateStreamHandler recorderStateStreamHandler = new RecorderStateStreamHandler();
+  private final RecorderStateStreamHandler recorderStateStreamHandler = new RecorderStateStreamHandler();
   private EventChannel eventRecordChannel;
-  private RecorderRecordStreamHandler recorderRecordStreamHandler = new RecorderRecordStreamHandler();
+  private final RecorderRecordStreamHandler recorderRecordStreamHandler = new RecorderRecordStreamHandler();
 
   @Nullable
   private AudioRecorder recorder;

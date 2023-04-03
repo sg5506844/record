@@ -1,13 +1,10 @@
 package com.llfbandit.record.record.processor;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.llfbandit.record.record.PCMReader;
 import com.llfbandit.record.record.RecordConfig;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 public class WavProcessor extends PcmProcessor {
   private int audioDataLength = 0;
@@ -90,6 +87,7 @@ public class WavProcessor extends PcmProcessor {
 
     short bitsPerSample = config.encoder.equals("pcm16bit") ? (short) 16 : (short) 8;
 
+    assert out != null;
     out.seek(0);
     out.writeBytes("RIFF"); // ChunkID
     out.writeInt(Integer.reverseBytes(36 + audioDataLength)); // ChunkSize

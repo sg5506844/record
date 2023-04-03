@@ -1,6 +1,5 @@
 package com.llfbandit.record.record.processor;
 
-import android.annotation.SuppressLint;
 import android.media.MediaCodec;
 import android.media.MediaMuxer;
 import android.os.Build;
@@ -10,8 +9,6 @@ import androidx.annotation.RequiresApi;
 
 import com.llfbandit.record.record.RecordConfig;
 import com.llfbandit.record.record.format.AudioCodecs;
-
-import java.nio.ByteBuffer;
 
 public class AmrProcessor extends CodecProcessor {
   public AmrProcessor(@NonNull OnAudioProcessorListener listener) {

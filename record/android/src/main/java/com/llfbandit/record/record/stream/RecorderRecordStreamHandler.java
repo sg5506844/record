@@ -25,7 +25,7 @@ public class RecorderRecordStreamHandler implements EventChannel.StreamHandler {
 
   public void sendRecordChunkEvent(byte[] buffer) {
     if (eventSink != null && activity != null) {
-      activity.runOnUiThread((Runnable) () -> eventSink.success(buffer));
+      activity.runOnUiThread(() -> eventSink.success(buffer));
     }
   }
 
