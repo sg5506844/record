@@ -103,7 +103,7 @@ packages:
       path: "../record_platform_interface"
       relative: true
     source: path
-    version: "0.5.0"
+    version: "0.6.0"
   record_web:
     dependency: "direct main"
     description:

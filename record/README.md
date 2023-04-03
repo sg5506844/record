@@ -2,7 +2,7 @@ Audio recorder from microphone to a given file path.
 
 No external dependencies:
 
-- On Android, MediaRecorder is used.  
+- On Android, AudioRecord is used.  
 - On iOS, AVAudioRecorder is used.  
 - On macOS, AVCaptureSession is used.  
 - On web, well... your browser!
@@ -26,7 +26,7 @@ External dependencies:
 <!-- Optional, you'll have to check this permission by yourself. -->
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
-- min SDK: 19 (maybe higher => encoder dependent)
+- min SDK: 21 (maybe higher => encoder dependent)
 
 ### iOS
 ```xml
@@ -52,7 +52,9 @@ External dependencies:
 | amplitude(dBFS)  | ✔️             |   ✔️           |         |            |  ✔️   |
 | permission check | ✔️             |   ✔️           |  ✔️    |            |  ✔️   |
 | num of channels  | ✔️             |   ✔️           |  ✔️    |    ✔️      |  ✔️   |  ✔️
-| device selection |                | (auto BT/mic)   |  ✔️    |    ✔️      |  ✔️   |  ✔️
+| device selection | (auto BT/mic)  | (auto BT/mic)   |  ✔️    |    ✔️      |  ✔️   |  ✔️
+| auto gain        | ✔️             |                 |         |            |       |  
+| noise suppresion | ✔️             |                 |         |            |       |  
 
 
 | Encoder         | Android        | iOS     | web     | Windows | macOS   | linux
@@ -65,12 +67,22 @@ External dependencies:
 | opus            | ✔️            |   ✔️    |  ?      |   ✔️    |  ✔️    |  ✔️ 
 | vorbisOgg       | ?(optional)   |          |  ?      |  ✔️     |        |   ✔️  
 | wav             |  ✔️           |         |  ?      |   ✔️     |        |   ✔️ 
-| flac            |               |    ✔️    |  ?      |  ✔️     |   ✔️  |   ✔️
+| flac            |  ✔️           |    ✔️    |  ?      |  ✔️     |   ✔️  |   ✔️
 | pcm8bit         | ✔️            |   ✔️    |  ?      |          |  ✔️   |  
 | pcm16bit        | ✔️            |   ✔️    |  ?      |          |  ✔️   |  
 
+## Streaming
+
+| Encoder         | Android        | iOS     | web     | Windows | macOS   | linux
+|-----------------|----------------|---------|---------|---------|---------|---------
+| aacLc           | ✔️            |       |        |       |      |  
+| aacEld          | ✔️            |       |        |       |      | 
+| aacHe           | ✔️            |       |        |       |      |  
+| pcm8bit         | ✔️            |       |        |       |     |  
+| pcm16bit        | ✔️            |       |        |       |     |  
+* Note : AAC is streamed with raw AAC with ADTS headers.
+
 For every encoder, you should be really careful with given sampling rates.
-For example, opus could or could not be recorded at 44100Hz.
 
 If a given encoder is not supported when starting recording on platform, the fallbacks are:  
 

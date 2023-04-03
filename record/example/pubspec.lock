@@ -257,7 +257,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.4.4"
+    version: "5.0.0-dev1"
   record_linux:
     dependency: "direct overridden"
     description:
@@ -278,7 +278,7 @@ packages:
       path: "../../record_platform_interface"
       relative: true
     source: path
-    version: "0.5.0"
+    version: "0.6.0"
   record_web:
     dependency: "direct overridden"
     description:

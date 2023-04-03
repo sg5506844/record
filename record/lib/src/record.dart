@@ -1,48 +1,21 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:record_platform_interface/record_platform_interface.dart';
 
 /// Audio recorder API
-class Record implements RecordPlatform {
+class AudioRecorder implements RecordPlatform {
   StreamController<Amplitude>? _amplitudeStreamCtrl;
 
   Timer? _amplitudeTimer;
 
   @override
-  Future<void> start({
-    String? path,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) {
-    return RecordPlatform.instance.start(
-      path: path,
-      encoder: encoder,
-      bitRate: bitRate,
-      samplingRate: samplingRate,
-      numChannels: numChannels,
-      device: device,
-    );
+  Future<void> start(RecordConfig config, {required String path}) {
+    return RecordPlatform.instance.start(config, path: path);
   }
 
   @override
-  Future<Stream<List<int>>> startStream({
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) {
-    return RecordPlatform.instance.startStream(
-      encoder: encoder,
-      bitRate: bitRate,
-      samplingRate: samplingRate,
-      numChannels: numChannels,
-      device: device,
-    );
+  Future<Stream<List<int>>> startStream(RecordConfig config) {
+    return RecordPlatform.instance.startStream(config);
   }
 
   @override

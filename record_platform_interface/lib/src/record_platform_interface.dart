@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:record_platform_interface/src/method_channel_record.dart';
-import 'package:record_platform_interface/src/types/types.dart';
+import 'package:record_platform_interface/src/record_method_channel.dart';
+
+import '../record_platform_interface.dart';
 
 /// The interface that implementations of Record must implement.
 ///
@@ -19,7 +20,7 @@ abstract class RecordPlatform extends PlatformInterface {
   /// Constructs a [RecordPlatform].
   RecordPlatform() : super(token: _token);
 
-  static RecordPlatform _instance = MethodChannelRecord();
+  static RecordPlatform _instance = RecordMethodChannel();
 
   /// The default instance of [RecordPlatform] to use.
   ///
@@ -36,49 +37,17 @@ abstract class RecordPlatform extends PlatformInterface {
 
   /// Starts new recording session.
   ///
-  /// [path]: The output path file.
-  /// If path is null, a temporary file will be created and thus auto-managed
-  /// by the system to delete it when required.
+  /// [path]: The output path file. Required on all IO platforms.
+  /// On `web`: This parameter is ignored.
   ///
-  /// `web`: This parameter is ignored. Output path is retrieve on [stop]
-  /// method is called.
-  ///
-  /// [encoder]: The audio encoder to be used for recording.
-  ///
-  /// [bitRate]: The audio encoding bit rate in bits per second.
-  ///
-  /// [samplingRate]: The sampling rate for audio in samples per second.
-  /// Ignored on web platform.
-  ///
-  /// [numChannels]: The numbers of channels for the recording.
-  /// 1 = mono, 2 = stereo, etc.
-  ///
-  /// [device]: The device to be used for recording. If null, default device
-  /// will be selected.
-  Future<void> start({
-    String? path,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  });
+  /// Output path can be retrieves when [stop] method is called.
+  Future<void> start(RecordConfig config, {required String path});
 
   /// Same as [start] with output stream instead of a path.
   ///
-  /// Where possible, the underlying platform won't generate a file.
-  /// Otherwise, a temporary file will be created and thus auto-managed
-  /// by the system to delete it when required.
-  ///
   /// When stopping the record, you must rely on stream close event to get
   /// full recorded data.
-  Future<Stream<List<int>>> startStream({
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) =>
+  Future<Stream<List<int>>> startStream(RecordConfig config) =>
       throw UnimplementedError(
           'startStream not implemented on the current platform.');
 

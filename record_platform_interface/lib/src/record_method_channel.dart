@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:record_platform_interface/src/record_platform_interface.dart';
-import 'package:record_platform_interface/src/types/types.dart';
 
-class MethodChannelRecord extends RecordPlatform {
+import '../record_platform_interface.dart';
+
+class RecordMethodChannel extends RecordPlatform {
   // Channel handlers
   final _methodChannel = const MethodChannel('com.llfbandit.record/messages');
   final _eventChannel = const EventChannel('com.llfbandit.record/events');
@@ -44,38 +44,25 @@ class MethodChannelRecord extends RecordPlatform {
   }
 
   @override
-  Future<void> start({
-    String? path,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) {
+  Future<void> start(RecordConfig config, {required String path}) {
     return _methodChannel.invokeMethod('start', {
       'path': path,
-      'encoder': encoder.name,
-      'bitRate': bitRate,
-      'samplingRate': samplingRate,
-      'numChannels': numChannels,
-      'device': device?.toMap(),
+      'encoder': config.encoder.name,
+      'bitRate': config.bitRate,
+      'samplingRate': config.samplingRate,
+      'numChannels': config.numChannels,
+      'device': config.device?.toMap(),
     });
   }
 
   @override
-  Future<Stream<List<int>>> startStream({
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) async {
+  Future<Stream<List<int>>> startStream(RecordConfig config) async {
     await _methodChannel.invokeMethod('startStream', {
-      'encoder': encoder.name,
-      'bitRate': bitRate,
-      'samplingRate': samplingRate,
-      'numChannels': numChannels,
-      'device': device?.toMap(),
+      'encoder': config.encoder.name,
+      'bitRate': config.bitRate,
+      'samplingRate': config.samplingRate,
+      'numChannels': config.numChannels,
+      'device': config.device?.toMap(),
     });
 
     return _startListeningRecordStream();

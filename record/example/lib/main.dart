@@ -10,19 +10,19 @@ import 'package:record_example/audio_player.dart';
 
 void main() => runApp(const MyApp());
 
-class AudioRecorder extends StatefulWidget {
+class _AudioRecorder extends StatefulWidget {
   final void Function(String path) onStop;
 
-  const AudioRecorder({Key? key, required this.onStop}) : super(key: key);
+  const _AudioRecorder({Key? key, required this.onStop}) : super(key: key);
 
   @override
-  State<AudioRecorder> createState() => _AudioRecorderState();
+  State<_AudioRecorder> createState() => _AudioRecorderState();
 }
 
-class _AudioRecorderState extends State<AudioRecorder> {
+class _AudioRecorderState extends State<_AudioRecorder> {
   int _recordDuration = 0;
   Timer? _timer;
-  final _audioRecorder = Record();
+  final _audioRecorder = AudioRecorder();
   StreamSubscription<RecordState>? _recordSub;
   RecordState _recordState = RecordState.stop;
   StreamSubscription<Amplitude>? _amplitudeSub;
@@ -59,7 +59,10 @@ class _AudioRecorderState extends State<AudioRecorder> {
         // final devs = await _audioRecorder.listInputDevices();
         // final isRecording = await _audioRecorder.isRecording();
 
-        await _audioRecorder.start(path: p.join(dir.path, 'test.m4a'));
+        await _audioRecorder.start(
+          const RecordConfig(),
+          path: p.join(dir.path, 'test.m4a'),
+        );
         // final stream = await _audioRecorder.startStream();
         // stream.listen(
         //   (event) => print(event),
@@ -259,7 +262,7 @@ class _MyAppState extends State<MyApp> {
                     },
                   ),
                 )
-              : AudioRecorder(
+              : _AudioRecorder(
                   onStop: (path) {
                     if (kDebugMode) print('Recorded file path: $path');
                     setState(() {
