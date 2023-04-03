@@ -17,9 +17,6 @@ dependency_overrides:
   record_platform_interface:
     path: ../record_platform_interface
 
-dev_dependencies:
-  flutter_lints: ^2.0.0
-
 flutter:
   plugin:
     implements: record

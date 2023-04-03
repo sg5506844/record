@@ -78,11 +78,10 @@ packages:
   record_platform_interface:
     dependency: "direct main"
     description:
-      name: record_platform_interface
-      sha256: "7a2d4ce7ac3752505157e416e4e0d666a54b1d5d8601701b7e7e5e30bec181b4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
+      path: "../record_platform_interface"
+      relative: true
+    source: path
+    version: "0.6.0"
   sky_engine:
     dependency: transitive
     description: flutter

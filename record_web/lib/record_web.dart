@@ -66,29 +66,22 @@ class RecordPluginWeb extends RecordPlatform {
   }
 
   @override
-  Future<void> start({
-    String? path,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) async {
+  Future<void> start(RecordConfig config, {required String path}) async {
     _mediaRecorder?.stop();
     _resetMediaRecorder();
 
     final constraints = {
       'audio': true,
-      'audioBitsPerSecond': bitRate,
-      'bitsPerSecond': bitRate,
-      'sampleRate': samplingRate,
-      'channelCount': numChannels,
-      if (device != null) 'deviceId': {'exact': device.id}
+      'audioBitsPerSecond': config.bitRate,
+      'bitsPerSecond': config.bitRate,
+      'sampleRate': config.samplingRate,
+      'channelCount': config.numChannels,
+      if (config.device != null) 'deviceId': {'exact': config.device!.id}
     };
 
     // Try to assign dedicated mime type.
     // If contrainst isn't set, browser will record with its default codec.
-    final mimeType = _getSupportedMimeType(encoder);
+    final mimeType = _getSupportedMimeType(config.encoder);
     if (mimeType != null) {
       constraints['mimeType'] = mimeType;
     }
