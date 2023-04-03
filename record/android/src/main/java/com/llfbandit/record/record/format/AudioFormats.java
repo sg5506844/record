@@ -10,13 +10,6 @@ public class AudioFormats {
   private AudioFormats() {
   }
 
-//  https://github.com/dburckh/EncodeRawAudio/blob/develop/app/src/main/java/com/homesoft/encoderawaudio/EncodeViewModel.kt
-//  https://android.googlesource.com/platform/frameworks/base/+/master/packages/SystemUI/src/com/android/systemui/screenrecord/ScreenInternalAudioRecorder.java
-//  https://github.com/jeryz/AudioRecorder/tree/master/lib_recorder/src/main/java/com/zjr/recorder/processor
-//  Samples / amplitude
-  // https://www.programcreek.com/java-api-examples/?code=NandagopalR%2FAndroid-Audio-Recorder%2FAndroid-Audio-Recorder-master%2Fapp%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgithub%2Faxet%2Faudiorecorder%2Fencoders%2FFormat3GP.java#
-  // https://github.com/HelloHuDi/AudioCapture/blob/master/audiocapture/src/main/java/com/hd/audiocapture/capture/AudioRecordCapture.java
-
   public static boolean isEncoderSupported(String mimeType) {
     MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
 
