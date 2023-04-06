@@ -84,14 +84,14 @@ packages:
     source: hosted
     version: "2.1.4"
   record_android:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../record_android"
       relative: true
     source: path
     version: "1.0.0"
   record_ios:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../record_ios"
       relative: true

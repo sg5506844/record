@@ -15,9 +15,10 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PCMReader {
-  private AudioRecord reader;
+  // Config to setup the recording
   private final RecordConfig config;
-  // Recorder features
+  // Recorder & features
+  private AudioRecord reader;
   private NoiseSuppressor noiseSuppressor;
   private AutomaticGainControl automaticGainControl;
   // Min size of the buffer for writings
@@ -72,6 +73,10 @@ public class PCMReader {
     }
   }
 
+  public int getAmplitude() {
+    return amplitude.get();
+  }
+
   private void createReader() throws Exception {
     final int audioFormat = getAudioFormat();
     final int channelConfig = getChannels();
@@ -123,19 +128,19 @@ public class PCMReader {
   }
 
   private void enableNoiseSuppressor() {
-    if (NoiseSuppressor.isAvailable()) {
+    if (config.noiseCancel && NoiseSuppressor.isAvailable()) {
       noiseSuppressor = NoiseSuppressor.create(reader.getAudioSessionId());
       if (noiseSuppressor != null) {
-        noiseSuppressor.setEnabled(config.noiseCancel);
+        noiseSuppressor.setEnabled(true);
       }
     }
   }
 
   private void enableAutomaticGainControl() {
-    if (AutomaticGainControl.isAvailable()) {
+    if (config.autoGain && AutomaticGainControl.isAvailable()) {
       automaticGainControl = AutomaticGainControl.create(reader.getAudioSessionId());
       if (automaticGainControl != null) {
-        automaticGainControl.setEnabled(config.autoGain);
+        automaticGainControl.setEnabled(true);
       }
     }
   }

@@ -22,8 +22,6 @@ public class MethodCallHandlerImpl implements MethodCallHandler {
   private final PermissionManager permissionManager;
   private final RecorderWrapper recorderWrapper;
 
-
-
   public MethodCallHandlerImpl(
       @NonNull PermissionManager permissionManager,
       @NonNull BinaryMessenger messenger) {

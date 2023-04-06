@@ -164,6 +164,10 @@ abstract public class CodecProcessor implements AudioProcessor {
             index, 0, resultBytes, 0,
             recordClosed.get() ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0
         );
+
+        if (!isPaused()) {
+          listener.onAmplitude(reader.getAmplitude());
+        }
       } catch (Exception e) {
         listener.onFailure(e);
         complete();

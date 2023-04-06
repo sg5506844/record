@@ -12,8 +12,9 @@ class RecordMethodChannel extends RecordPlatform {
     'com.llfbandit.record/eventsRecord',
   );
 
-  StreamSubscription<List<int>>? _recordStreamSub;
   StreamController<List<int>>? _recordStreamCtrl;
+  Stream<List<int>>? _recordStream;
+  Stream<RecordState>? _stateStream;
 
   @override
   Future<bool> hasPermission() async {
@@ -52,20 +53,42 @@ class RecordMethodChannel extends RecordPlatform {
       'samplingRate': config.samplingRate,
       'numChannels': config.numChannels,
       'device': config.device?.toMap(),
+      'noiseCancel': config.noiseCancel,
+      'autoGain': config.autoGain,
     });
   }
 
   @override
   Future<Stream<List<int>>> startStream(RecordConfig config) async {
+    await _stopListeningRecordStream();
+
+    if (_recordStream == null) {
+      _recordStream = _eventRecordChannel
+          .receiveBroadcastStream()
+          .map<List<int>>((data) => data);
+
+      _recordStream!.listen(
+        (data) {
+          final streamCtrl = _recordStreamCtrl;
+          if (streamCtrl == null || streamCtrl.isClosed) return;
+          streamCtrl.add(data);
+        },
+      );
+    }
+
+    _recordStreamCtrl = StreamController();
+
     await _methodChannel.invokeMethod('startStream', {
       'encoder': config.encoder.name,
       'bitRate': config.bitRate,
       'samplingRate': config.samplingRate,
       'numChannels': config.numChannels,
       'device': config.device?.toMap(),
+      'noiseCancel': config.noiseCancel,
+      'autoGain': config.autoGain,
     });
 
-    return _startListeningRecordStream();
+    return _recordStreamCtrl!.stream;
   }
 
   @override
@@ -105,8 +128,9 @@ class RecordMethodChannel extends RecordPlatform {
 
   @override
   Future<List<InputDevice>> listInputDevices() async {
-    final devices =
-        await _methodChannel.invokeMethod<List<dynamic>>('listInputDevices');
+    final devices = await _methodChannel.invokeMethod<List<dynamic>>(
+      'listInputDevices',
+    );
 
     return devices
             ?.map((d) => InputDevice.fromMap(d as Map))
@@ -116,26 +140,15 @@ class RecordMethodChannel extends RecordPlatform {
 
   @override
   Stream<RecordState> onStateChanged() {
-    return _eventChannel.receiveBroadcastStream().map<RecordState>(
+    _stateStream ??= _eventChannel.receiveBroadcastStream().map<RecordState>(
           (state) => RecordState.values.firstWhere((e) => e.index == state),
         );
-  }
 
-  Future<Stream<List<int>>> _startListeningRecordStream() async {
-    await _stopListeningRecordStream();
-
-    final stream = _eventRecordChannel
-        .receiveBroadcastStream()
-        .map<List<int>>((data) => data);
-
-    _recordStreamCtrl = StreamController();
-    _recordStreamSub = stream.listen(_recordStreamCtrl?.add);
-
-    return stream;
+    return _stateStream ?? Stream.value(RecordState.stop);
   }
 
   Future<void> _stopListeningRecordStream() async {
-    await _recordStreamSub?.cancel();
     await _recordStreamCtrl?.close();
+    _recordStreamCtrl = null;
   }
 }

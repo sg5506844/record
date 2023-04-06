@@ -195,6 +195,8 @@ public class PcmProcessor implements AudioProcessor {
               buffer.get(bytes, 0, resultBytes);
 
               onAudioChunk(bytes, resultBytes);
+
+              listener.onAmplitude(reader.getAmplitude());
             }
           }
         }

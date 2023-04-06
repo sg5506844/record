@@ -56,7 +56,7 @@ External dependencies:
 | auto gain        | ✔️             |                 |         |            |       |  
 | noise suppresion | ✔️             |                 |         |            |       |  
 
-
+## File
 | Encoder         | Android        | iOS     | web     | Windows | macOS   | linux
 |-----------------|----------------|---------|---------|---------|---------|---------
 | aacLc           | ✔️            |   ✔️    |  ?      |   ✔️    |  ✔️    |  ✔️ 
@@ -71,16 +71,18 @@ External dependencies:
 | pcm8bit         | ✔️            |   ✔️    |  ?      |          |  ✔️   |  
 | pcm16bit        | ✔️            |   ✔️    |  ?      |          |  ✔️   |  
 
-## Streaming
-
+## Stream
 | Encoder         | Android        | iOS     | web     | Windows | macOS   | linux
 |-----------------|----------------|---------|---------|---------|---------|---------
-| aacLc           | ✔️            |       |        |       |      |  
-| aacEld          | ✔️            |       |        |       |      | 
-| aacHe           | ✔️            |       |        |       |      |  
-| pcm8bit         | ✔️            |       |        |       |     |  
-| pcm16bit        | ✔️            |       |        |       |     |  
-* Note : AAC is streamed with raw AAC with ADTS headers.
+| aacLc           | ✔️*            |       |  **      |       |      |  
+| aacEld          | ✔️*            |       |  **      |       |      | 
+| aacHe           | ✔️*            |       |  **      |       |      |  
+| pcm8bit         | ✔️            |       |   **     |       |     |  
+| pcm16bit        | ✔️            |       |   **     |       |     |  
+
+\* AAC is streamed with raw AAC with ADTS headers, so it can be saved as file.  
+** web platform may allow more encoders.  
+
 
 For every encoder, you should be really careful with given sampling rates.
 
@@ -112,13 +114,10 @@ final record = Record();
 
 // Check and request permission
 if (await record.hasPermission()) {
-  // Start recording
-  await record.start(
-    path: 'aFullPath/myFile.m4a',
-    encoder: AudioEncoder.aacLc, // by default
-    bitRate: 128000, // by default
-    sampleRate: 44100, // by default
-  );
+  // Start recording to file
+  await record.start(const RecordConfig(), path: 'aFullPath/myFile.m4a');
+  // Start recording to stream
+  final stream = await record.startStream(const RecordConfig());
 }
 
 // Get the state of the recorder
